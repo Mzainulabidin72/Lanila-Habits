@@ -1,0 +1,1 @@
+export default function Empty({msg}){return <div className="card" style={{textAlign:'center'}}><p>{msg}</p><a className="btn p" style={{display:'inline-flex',alignItems:'center',textDecoration:'none'}} href="#new">Buat kebiasaan</a></div>}

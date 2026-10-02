@@ -1,5 +1,4 @@
-# Lanila Habits (terintegrasi Supabase)
-1. Supabase Dashboard > SQL Editor: jalankan `supabase/migration.sql`
-2. Pastikan `.env` terisi (lihat `.env.example`)
-3. `npm install` lalu `npm start` (atau `npm run dev`) → http://localhost:3000
-Akun memakai Supabase Auth bersama, jadi satu login berlaku di semua aplikasi Lanila.
+# Lanila Habits (Vite + React + Supabase)
+1. Supabase SQL Editor: jalankan `supabase/migration.sql` (opsional: `supabase/seed_demo.sql`)
+2. Isi `.env` (lihat `.env.example`)
+3. `npm install` → `npm run dev` (http://localhost:5173) · `npm run build` untuk produksi

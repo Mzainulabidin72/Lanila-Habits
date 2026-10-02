@@ -1,0 +1,120 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lanila Habits</title><link rel="icon" href="logo.png">
+<style>
+:root{--bg:#fbf9f6;--card:#fff;--tx:#1a1f36;--mu:#6b7285;--bd:#ebe7e0;--ac:#f08a1c;--ac2:#fff1de;--ok:#1f9d63;--wa:#e5b312;--ms:#dcd8d0;--r:16px}
+[data-theme=dark]{--bg:#12141f;--card:#1b1e2d;--tx:#eef0f8;--mu:#9aa1b8;--bd:#2a2e44;--ac:#fb9f3a;--ac2:#33281a;--ok:#3ccf8e;--wa:#f5c842;--ms:#2d3249}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx)}
+button,input,select,textarea{font:inherit;color:inherit}:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+h1{font-size:1.6rem;margin:.2rem 0}h2{font-size:1.1rem;margin:1.2rem 0 .6rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:1rem;margin-bottom:.75rem}
+.btn{min-height:44px;padding:0 1.1rem;border-radius:12px;border:1px solid var(--bd);background:var(--card);cursor:pointer}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#1a1200;font-weight:600}.btn:disabled{opacity:.6}
+input,select,textarea{width:100%;min-height:44px;padding:.5rem .7rem;border-radius:12px;border:1px solid var(--bd);background:var(--card);margin:.25rem 0 .7rem}
+label{font-size:.9rem;color:var(--mu)}.mu{color:var(--mu);font-size:.9rem}.row{display:flex;gap:.7rem;align-items:center}.sp{flex:1}
+.bar{height:10px;border-radius:9px;background:var(--ms);overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);transition:width .4s}
+.h{display:flex;gap:.8rem;align-items:center}.h.done{background:var(--ac2)}.ic{font-size:1.6rem;width:48px;height:48px;border-radius:14px;background:var(--ac2);display:grid;place-items:center}
+.chk{width:48px;height:48px;border-radius:50%;border:2px solid var(--ms);background:none;cursor:pointer;font-size:1.3rem;transition:transform .2s}
+.done .chk{background:var(--ok);border-color:var(--ok);color:#fff;transform:scale(1.08)}
+.num{width:80px;margin:0}.err{color:#d93a3a;min-height:1.3em}
+nav{position:fixed;z-index:5;background:var(--card);border:1px solid var(--bd)}nav a{color:var(--mu);text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:48px;padding:.3rem .7rem;border-radius:12px;font-size:.78rem}nav a.on{color:var(--ac);font-weight:700}
+nav{left:0;right:0;bottom:0;display:flex;justify-content:space-around;border-width:1px 0 0}main{max-width:760px;margin:0 auto;padding:1rem 1rem 6rem}
+@media(min-width:800px){nav{top:0;bottom:0;right:auto;width:200px;flex-direction:column;justify-content:flex-start;gap:.3rem;padding:1rem;border-width:0 1px 0 0}nav a{flex-direction:row;gap:.6rem;font-size:1rem}main{margin-left:230px;padding-bottom:2rem}}
+.logo{height:34px;margin-bottom:1rem}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cell{aspect-ratio:1;border-radius:8px;border:0;background:var(--ms);cursor:pointer;font-size:.8rem;color:var(--tx)}
+.moods button{font-size:1.8rem;min-width:48px;min-height:48px;border-radius:12px;border:2px solid transparent;background:none;cursor:pointer}.moods .on{border-color:var(--ac)}
+.auth{max-width:380px;margin:8vh auto;padding:1rem}.bw{display:flex;align-items:flex-end;gap:6px;height:110px}.bw div{flex:1;background:var(--ac);border-radius:6px 6px 0 0;min-height:3px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style><script src="/config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={user:null,habits:[],comp:{},refl:[],page:'home',cm:0,sel:null,mode:'login'};
+const sb=supabase.createClient(LANILA.url,LANILA.key);
+const ok=async p=>{const{data,error}=await p;if(error){if(error.status===401||/JWT/.test(error.message)){S.user=null;render()}throw Error('Terjadi kesalahan. Coba lagi.')}return data};
+const pg=async mk=>{let o=[],i=0,d;do{d=await ok(mk().range(i,i+999));o=o.concat(d);i+=1000}while(d.length===1000);return o};
+async function authGo(r){const email=$('#e').value.trim(),password=$('#p').value;
+ if(r){const name=$('#n').value.trim();if(!name||password.length<8)throw Error('Isi nama dan password minimal 8 karakter.');
+  const{data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});
+  if(error)throw Error(/registered/i.test(error.message)?'Email sudah terdaftar di akun Lanila. Silakan masuk.':'Pendaftaran gagal. Periksa data lalu coba lagi.');
+  if(!data.session){S.mode='login';render();$('#er').textContent='Akun dibuat. Cek email untuk konfirmasi, lalu masuk.';return}}
+ else{const{error}=await sb.auth.signInWithPassword({email,password});if(error)throw Error(/confirm/i.test(error.message)?'Email belum dikonfirmasi. Cek inbox kamu.':'Email atau password salah.')}
+ await load()}
+const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'});
+const addD=(d,n)=>{const t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10)};
+const dow=d=>new Date(d+'T00:00:00Z').getUTCDay();
+const sched=(h,d)=>d>=h.start_date&&(h.frequency==='daily'||(h.frequency==='weekdays'?dow(d)>0&&dow(d)<6:dow(d)%6===0));
+const val=(h,d)=>S.comp[h.id+'|'+d]||0,st=(h,d)=>{const v=val(h,d);return v>=h.target_value?'done':v>0?'part':'miss'};
+function streaks(h){const t=today();let run=0,best=0;for(let d=h.start_date;d<=t;d=addD(d,1)){if(!sched(h,d))continue;if(st(h,d)==='done'){run++;best=Math.max(best,run)}else if(d!==t)run=0}return{cur:run,best}}
+function cons(h,days){const t=today();let n=0,k=0;for(let i=0;i<days;i++){const d=addD(t,-i);if(sched(h,d)){n++;if(st(h,d)==='done')k++}}return n?Math.round(k/n*100):null}
+const dayRatio=d=>{const s=S.habits.filter(h=>sched(h,d));return s.length?{n:s.length,k:s.filter(h=>st(h,d)==='done').length,p:s.filter(h=>st(h,d)==='part').length}:null};
+const score=d=>{const s=S.habits.filter(h=>sched(h,d));return s.length?Math.round(s.reduce((a,h)=>a+Math.min(val(h,d)/h.target_value,1),0)/s.length*100):0};
+const toast=m=>{const e=document.createElement('div');e.textContent=m;e.setAttribute('role','status');e.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#1a1f36;color:#fff;padding:.6rem 1rem;border-radius:12px;z-index:9';document.body.append(e);setTimeout(()=>e.remove(),2500)};
+async function load(){try{const{data:{session}}=await sb.auth.getSession();if(!session)throw 0;const u=session.user;
+ const[h,c,r]=await Promise.all([ok(sb.from('lh_habits').select('*').eq('status','active').order('id')),pg(()=>sb.from('lh_completions').select('habit_id,date,value').order('id')),ok(sb.from('lh_reflections').select('date,mood,went_well,improvement').order('date',{ascending:false}).limit(60))]);
+ S.user={id:u.id,email:u.email,name:u.user_metadata?.name||u.email.split('@')[0]};S.habits=h;S.refl=r;S.comp={};c.forEach(x=>S.comp[x.habit_id+'|'+x.date]=x.value);if(S.obOn===undefined)S.obOn=!h.length}catch(e){S.user=null}render()}
+async function setV(id,v,d=today()){S.comp[id+'|'+d]=Number(v)||0;render();try{await ok(sb.from('lh_completions').upsert({habit_id:id,user_id:S.user.id,date:d,value:Number(v)||0},{onConflict:'habit_id,date'}))}catch(e){toast(e.message);load()}}
+function authView(){const r=S.mode==='register';return `<div class="auth"><img class="logo" src="logo.png" alt="Lanila Habits" style="height:44px"><h1>${r?'Buat akun':'Masuk'}</h1><p class="mu">Satu akun untuk semua aplikasi Lanila.</p>
+<form id="af" novalidate>${r?'<label for="n">Nama lengkap</label><input id="n" autocomplete="name">':''}<label for="e">Email</label><input id="e" type="email" autocomplete="email"><label for="p">Password</label><input id="p" type="password" autocomplete="${r?'new-password':'current-password'}">
+${r?'<label for="p2">Konfirmasi password</label><input id="p2" type="password" autocomplete="new-password">':''}<label class="row"><input type="checkbox" style="width:22px;min-height:22px;margin:0" onchange="document.querySelectorAll('#af input[type=password],#af input[data-pw]').forEach(i=>{i.type=this.checked?'text':'password';i.dataset.pw=1})"> Tampilkan password</label>
+<div class="err" id="er" role="alert"></div><button class="btn p" style="width:100%" id="sb">${r?'Daftar':'Masuk'}</button></form>
+<p class="mu" style="text-align:center"><a href="#" onclick="S.mode='${r?'login':'register'}';render();return false" style="color:var(--ac)">${r?'Sudah punya akun? Masuk':'Belum punya akun? Daftar'}</a></p></div>`}
+function bindAuth(){$('#af').onsubmit=async e=>{e.preventDefault();const r=S.mode==='register',er=$('#er');er.textContent='';
+ if(r&&$('#p').value!==$('#p2').value){er.textContent='Konfirmasi password tidak cocok.';return}
+ $('#sb').disabled=true;$('#sb').textContent='Memproses…';
+ try{await authGo(r)}catch(x){er.textContent=x.message;$('#sb').disabled=false;$('#sb').textContent=r?'Daftar':'Masuk'}}}
+function habitCard(h,d){const s=st(h,d),v=val(h,d),k=streaks(h).cur,simple=h.target_value===1&&!h.unit;
+ return `<div class="card h ${s==='done'?'done':''}"><div class="ic" aria-hidden="true">${esc(h.icon)}</div><div class="sp"><b>${esc(h.name)}</b><div class="mu">${esc(h.category)} · ${simple?'Selesai/belum':v+' / '+h.target_value+' '+esc(h.unit)} · 🔥 ${k}</div></div>
+ ${simple?'':`<input class="num" type="number" min="0" step="any" value="${v}" aria-label="Progres ${esc(h.name)}" onchange="setV(${h.id},this.value)">`}
+ <button class="chk" aria-pressed="${s==='done'}" aria-label="${s==='done'?'Batalkan':'Selesaikan'} ${esc(h.name)}" onclick="setV(${h.id},${s==='done'?0:h.target_value})">${s==='done'?'✓':''}</button></div>`}
+function home(){if(S.obOn)return onboard();const t=today(),hr=+new Date().toLocaleString('en-GB',{timeZone:'Asia/Jakarta',hour:'numeric',hour12:false}),g=hr<11?'Selamat pagi':hr<15?'Selamat siang':hr<19?'Selamat sore':'Selamat malam';
+ const list=S.habits.filter(h=>sched(h,t)),dn=list.filter(h=>st(h,t)==='done').length,pc=list.length?Math.round(dn/list.length*100):0;
+ const all=S.habits.map(streaks),cur=Math.max(0,...all.map(x=>x.cur)),best=Math.max(0,...all.map(x=>x.best));
+ return `<h1>${g}, ${esc(S.user.name.split(' ')[0])} 👋</h1><p class="mu">Langkah kecil, perubahan besar.</p>
+ <div class="card"><div class="row"><b class="sp">Progres hari ini</b><b>${dn} / ${list.length} · ${pc}%</b></div><div class="bar" role="progressbar" aria-valuenow="${pc}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pc}%"></i></div>
+ <div class="row mu" style="margin-top:.7rem"><span class="sp">🔥 Streak: <b>${cur} hari</b> (terbaik ${best})</span><span>Skor: <b>${score(t)}</b>/100</span></div></div>
+ <h2>Kebiasaan hari ini</h2>${list.length?list.map(h=>habitCard(h,t)).join(''):empty(S.habits.length?'Tidak ada kebiasaan terjadwal hari ini. Istirahat yang baik!':'Bangun kebiasaan pertamamu hari ini.')}`}
+const empty=m=>`<div class="card" style="text-align:center"><p>${m}</p><a class="btn p" style="display:inline-flex;align-items:center;text-decoration:none" href="#new">Buat kebiasaan</a></div>`;
+const SUG={Kesehatan:[['Minum 2L air','💧',2,'liter'],['Olahraga','🏃',1,''],['Tidur sebelum 23:00','😴',1,'']],Belajar:[['Baca 10 halaman','📖',10,'halaman'],['Belajar 30 menit','🧠',30,'menit'],['Latihan bahasa Inggris','🗣️',15,'menit']],Produktivitas:[['Rencanakan hari esok','🗓️',1,''],['Deep work 60 menit','💻',60,'menit'],['Kurangi media sosial','📵',1,'']],Spiritual:[['Meditasi 10 menit','🧘',10,'menit']],Keuangan:[['Catat pengeluaran','💰',1,'']]};
+const tg=c=>{S.ob=(S.ob||[]).includes(c)?S.ob.filter(x=>x!==c):[...(S.ob||[]),c];render()};
+async function addSug(c,i){const[n,ic,tv,u]=SUG[c][i];try{await ok(sb.from('lh_habits').insert({name:n,icon:ic,category:c,frequency:'daily',target_value:tv,unit:u,start_date:today()}));await load()}catch(e){toast(e.message)}}
+function onboard(){const ch=S.ob||[];
+ return `<h1>Selamat datang 👋</h1><p class="mu">Apa yang ingin kamu tingkatkan? Pilih satu atau lebih.</p>
+ <div class="row" style="flex-wrap:wrap">${Object.keys(SUG).map(c=>`<button class="btn ${ch.includes(c)?'p':''}" aria-pressed="${ch.includes(c)}" onclick="tg('${c}')">${c}</button>`).join('')}</div>
+ ${ch.length?'<h2>Saran kebiasaan</h2>':''}${ch.flatMap(c=>SUG[c].map((x,i)=>{const a=S.habits.some(h=>h.name===x[0]);return `<div class="card h"><div class="ic">${x[1]}</div><div class="sp"><b>${x[0]}</b><div class="mu">${c}</div></div><button class="btn" ${a?'disabled':''} onclick="addSug('${c}',${i})">${a?'Ditambahkan ✓':'Tambah'}</button></div>`})).join('')}
+ <div class="row" style="margin-top:1rem"><a class="btn" style="display:flex;align-items:center;text-decoration:none" href="#new" onclick="S.obOn=false">Buat sendiri</a><span class="sp"></span><button class="btn p" onclick="S.obOn=false;render()">${S.habits.length?'Selesai':'Lewati'}</button></div>`}
+function habitsPage(){return `<div class="row"><h1 class="sp">Kebiasaan saya</h1><a class="btn p" style="display:flex;align-items:center;text-decoration:none" href="#new">Tambah</a></div>`+
+ (S.habits.map(h=>{const s=streaks(h),c=cons(h,30);return `<div class="card h"><div class="ic">${esc(h.icon)}</div><div class="sp"><b>${esc(h.name)}</b><div class="mu">${esc(h.category)} · ${{daily:'Setiap hari',weekdays:'Hari kerja',weekends:'Akhir pekan'}[h.frequency]} · 🔥 ${s.cur} (terbaik ${s.best}) · Konsistensi ${c==null?'–':c+'%'}</div></div><button class="btn" onclick="arch(${h.id})" aria-label="Arsipkan ${esc(h.name)}">Arsipkan</button></div>`}).join('')||empty('Bangun kebiasaan pertamamu hari ini.'))}
+async function arch(id){if(!confirm('Arsipkan kebiasaan ini? Riwayat penyelesaian tetap tersimpan.'))return;try{await ok(sb.from('lh_habits').update({status:'archived'}).eq('id',id));await load()}catch(e){toast(e.message)}}
+function newPage(){return `<h1>Kebiasaan baru</h1><form class="card" id="hf"><label for="hn">Nama</label><input id="hn" placeholder="Coding 1 jam" maxlength="80"><div class="row"><div class="sp"><label for="hi">Ikon</label><select id="hi">${['💧','💻','📖','🏃','😴','🧘','💰','⭐'].map(i=>`<option>${i}</option>`).join('')}</select></div><div class="sp"><label for="hc">Kategori</label><select id="hc">${['Kesehatan','Produktivitas','Belajar','Kebugaran','Spiritual','Keuangan','Tidur','Personal'].map(i=>`<option>${i}</option>`).join('')}</select></div></div>
+ <label for="hf2">Frekuensi</label><select id="hf2"><option value="daily">Setiap hari</option><option value="weekdays">Hari kerja</option><option value="weekends">Akhir pekan</option></select>
+ <div class="row"><div class="sp"><label for="ht">Target (1 = selesai/belum)</label><input id="ht" type="number" min="0.01" step="any" value="1"></div><div class="sp"><label for="hu">Satuan (opsional)</label><input id="hu" placeholder="liter, menit"></div></div>
+ <div class="err" id="er" role="alert"></div><button class="btn p" id="sb">Simpan kebiasaan</button></form>`}
+function bindNew(){$('#hf').onsubmit=async e=>{e.preventDefault();$('#sb').disabled=true;try{const nm=$('#hn').value.trim();if(!nm)throw Error('Nama kebiasaan wajib diisi.');await ok(sb.from('lh_habits').insert({name:nm,icon:$('#hi').value,category:$('#hc').value,frequency:$('#hf2').value,target_value:Math.max(+$('#ht').value||1,0.01),unit:$('#hu').value.trim(),start_date:today()}));await load();location.hash='home'}catch(x){$('#er').textContent=x.message;$('#sb').disabled=false}}}
+function calPage(){const t=today(),b=new Date(t.slice(0,7)+'-01T00:00:00Z');b.setUTCMonth(b.getUTCMonth()+S.cm);const ym=b.toISOString().slice(0,7),n=new Date(Date.UTC(b.getUTCFullYear(),b.getUTCMonth()+1,0)).getUTCDate(),off=(b.getUTCDay()+6)%7;
+ let c='';for(let i=0;i<off;i++)c+='<span></span>';for(let i=1;i<=n;i++){const d=ym+'-'+String(i).padStart(2,'0'),r=dayRatio(d),col=!r||d>t?'':r.k===r.n?'var(--ok)':r.k+r.p>0?'var(--wa)':'';c+=`<button class="cell" style="${col?'background:'+col+';color:#fff':''}${S.sel===d?';outline:3px solid var(--ac)':''}" aria-label="${d}" onclick="S.sel='${d}';render()">${i}</button>`}
+ const sel=S.sel&&S.habits.filter(h=>sched(h,S.sel));
+ return `<h1>Kalender</h1><div class="row"><button class="btn" onclick="S.cm--;render()" aria-label="Bulan sebelumnya">‹</button><b class="sp" style="text-align:center">${b.toLocaleDateString('id-ID',{month:'long',year:'numeric',timeZone:'UTC'})}</b><button class="btn" onclick="S.cm++;render()" aria-label="Bulan berikutnya">›</button></div>
+ <div class="card"><div class="grid" style="margin-bottom:5px">${['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<span class="mu" style="text-align:center">${x}</span>`).join('')}</div><div class="grid">${c}</div><p class="mu">Hijau: selesai · Kuning: sebagian · Abu-abu: terlewat/tidak terjadwal</p></div>
+ ${S.sel?`<div class="card"><b>${S.sel}</b>${sel.length?sel.map(h=>`<div class="row"><span>${esc(h.icon)} ${esc(h.name)}</span><span class="sp"></span><span class="mu">${{done:'Selesai',part:'Sebagian',miss:'Belum'}[st(h,S.sel)]}</span></div>`).join(''):'<p class="mu">Tidak ada kebiasaan terjadwal.</p>'}</div>`:''}`}
+function stats(){const t=today(),tot=S.habits.length;if(!S.habits.length||!Object.keys(S.comp).length)return `<h1>Statistik</h1>${empty('Terus catat untuk membuka wawasanmu.')}`;
+ const wd=[1,2,3,4,5,6,0].map(w=>{let n=0,k=0;for(let i=0;i<90;i++){const d=addD(t,-i);if(dow(d)!==w)continue;const r=dayRatio(d);if(r){n+=r.n;k+=r.k}}return n?Math.round(k/n*100):0});
+ const names=['Sen','Sel','Rab','Kam','Jum','Sab','Min'],per=S.habits.map(h=>({h,c:cons(h,30)})).filter(x=>x.c!=null).sort((a,b)=>b.c-a.c);
+ const ndays=new Set(Object.keys(S.comp).map(k=>k.split('|')[1])).size,done=Object.entries(S.comp).filter(([k,v])=>{const h=S.habits.find(x=>x.id==k.split('|')[0]);return h&&v>=h.target_value}).length;
+ const bi=wd.indexOf(Math.max(...wd));
+ return `<h1>Statistik</h1><div class="card row"><div class="sp"><b>${tot}</b><div class="mu">Kebiasaan aktif</div></div><div class="sp"><b>${done}</b><div class="mu">Aktivitas selesai</div></div><div class="sp"><b>${Math.max(0,...S.habits.map(h=>streaks(h).best))}</b><div class="mu">Streak terpanjang</div></div></div>
+ <h2>Per hari dalam seminggu</h2><div class="card"><div class="bw">${wd.map((v,i)=>`<div style="height:${Math.max(v,3)}%" title="${v}%"></div>`).join('')}</div><div class="bw" style="height:auto;margin-top:4px">${names.map((n,i)=>`<span class="mu sp" style="text-align:center">${n}<br>${wd[i]}%</span>`).join('')}</div></div>
+ <h2>Performa kebiasaan (30 hari)</h2>${per.map(x=>`<div class="card"><div class="row"><span class="sp">${esc(x.h.icon)} ${esc(x.h.name)}</span><b>${x.c}%</b></div><div class="bar"><i style="width:${x.c}%"></i></div>${x.c<60?'<div class="mu">Butuh perhatian — mulai dari langkah kecil.</div>':''}</div>`).join('')}
+ <h2>Wawasan</h2><div class="card">${ndays>=7?`Konsistensimu paling tinggi di hari ${names[bi]} (${wd[bi]}%).`:'Terus catat kebiasaanmu untuk membuka wawasan personal.'}</div>`}
+function reflect(){const t=today(),cur=S.refl.find(r=>r.date===t)||{},M=['😞','😐','🙂','😄','🤩'];
+ return `<h1>Refleksi harian</h1><form class="card" id="rf"><b>Bagaimana harimu?</b><div class="moods" id="md">${M.map((m,i)=>`<button type="button" class="${cur.mood===i+1?'on':''}" data-m="${i+1}" aria-label="Mood ${i+1} dari 5">${m}</button>`).join('')}</div>
+ <label for="w">Apa yang berjalan baik?</label><textarea id="w" rows="3">${esc(cur.went_well)}</textarea><label for="i">Apa yang bisa diperbaiki besok?</label><textarea id="i" rows="3">${esc(cur.improvement)}</textarea><div class="err" id="er" role="alert"></div><button class="btn p" id="sb">Simpan refleksi</button></form>
+ <h2>Sebelumnya</h2>${S.refl.filter(r=>r.date!==t).map(r=>`<div class="card"><b>${r.date}</b> ${M[r.mood-1]} · Skor ${score(r.date)}<div class="mu">${esc(r.went_well)}</div></div>`).join('')||'<p class="mu">Belum ada refleksi sebelumnya.</p>'}`}
+function bindReflect(){let mood=(S.refl.find(r=>r.date===today())||{}).mood;document.querySelectorAll('#md button').forEach(b=>b.onclick=()=>{mood=+b.dataset.m;document.querySelectorAll('#md button').forEach(x=>x.classList.toggle('on',x===b))});
+ $('#rf').onsubmit=async e=>{e.preventDefault();try{if(!mood)throw Error('Pilih mood hari ini.');await ok(sb.from('lh_reflections').upsert({user_id:S.user.id,date:today(),mood,went_well:$('#w').value,improvement:$('#i').value},{onConflict:'user_id,date'}));await load();toast('Refleksi tersimpan')}catch(x){$('#er').textContent=x.message}}}
+function settings(){return `<h1>Pengaturan</h1><div class="card"><b>${esc(S.user.name)}</b><div class="mu">${esc(S.user.email)}</div></div><div class="card"><label for="th">Tampilan</label><select id="th" onchange="setTheme(this.value)"><option value="system">Ikuti sistem</option><option value="light">Terang</option><option value="dark">Gelap</option></select><p class="mu">Bahasa: Indonesia</p></div><button class="btn" onclick="sb.auth.signOut().finally(()=>{S.user=null;render()})">Keluar</button>`}
+function setTheme(v){localStorage.setItem('th',v);applyTheme()}
+function applyTheme(){const v=localStorage.getItem('th')||'system';document.documentElement.dataset.theme=v==='system'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):v}
+const pages={home,habits:habitsPage,new:newPage,calendar:calPage,stats,reflect,settings};
+function render(){applyTheme();const a=$('#app');if(!S.user){a.innerHTML=authView();bindAuth();return}
+ const p=pages[S.page]?S.page:'home',nav=[['home','🏠','Beranda'],['habits','✅','Kebiasaan'],['calendar','📅','Kalender'],['stats','📊','Statistik'],['reflect','📝','Refleksi'],['settings','⚙️','Pengaturan']];
+ a.innerHTML=`<nav aria-label="Navigasi utama">${nav.map(n=>`<a href="#${n[0]}" class="${n[0]===p?'on':''}" ${n[0]===p?'aria-current="page"':''}><span aria-hidden="true">${n[1]}</span>${n[2]}</a>`).join('')}</nav><main>${pages[p]()}</main>`;
+ if(p==='new')bindNew();if(p==='reflect')bindReflect();if(p==='settings')$('#th').value=localStorage.getItem('th')||'system'}
+addEventListener('hashchange',()=>{S.page=location.hash.slice(1)||'home';render()});S.page=location.hash.slice(1)||'home';load();
+</script></body></html>
