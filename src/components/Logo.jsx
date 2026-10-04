@@ -1,0 +1,1 @@
+export default function Logo(){return <><img className="logo logo-l" src="/logo.png" alt="Lanila" width="379" height="105"/><img className="logo logo-d" src="/logo-dark.png" alt="Lanila" width="379" height="105"/></>}
