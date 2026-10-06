@@ -1,13 +1,15 @@
 import {useState,useEffect} from 'react';import useData from './hooks/useData';
 import Auth from './pages/Auth';import Home from './pages/Home';import Onboarding from './pages/Onboarding';import Habits from './pages/Habits';import NewHabit from './pages/NewHabit';
 import Calendar from './pages/Calendar';import Stats from './pages/Stats';import Reflect from './pages/Reflect';import Settings from './pages/Settings';import HabitDetail from './pages/HabitDetail';
-import Goals from './pages/Goals';import Achievements from './pages/Achievements';import Profile from './pages/Profile';import useReminders from './hooks/useReminders';import History from './pages/History';import ResetPassword from './pages/ResetPassword';
+import Goals from './pages/Goals';import Achievements from './pages/Achievements';import Profile from './pages/Profile';import useReminders from './hooks/useReminders';import History from './pages/History';import {appFromUrl} from './lib/apps';import ResetPassword from './pages/ResetPassword';
 // [id, ikon, label, kelas] — 'dm' disembunyikan di bottom nav HP (masuk Menu), 'mo' hanya tampil di HP
 const NAV=[['home','🏠','Beranda'],['habits','✅','Kebiasaan'],['calendar','📅','Kalender'],['goals','🎯','Target'],['stats','📊','Statistik','dm'],['reflect','📝','Refleksi','dm'],['achievements','🏆','Pencapaian','dm'],['history','🕘','Riwayat','dm'],['profile','👤','Profil','dm'],['settings','⚙️','Pengaturan','dm'],['menu','☰','Menu','mo']];
 export default function App(){
  const d=useData();useReminders(d.habits,d.comp);const [page,setPage]=useState(location.hash.slice(1)||'home'),[ob,setOb]=useState(null);
  useEffect(()=>{const f=()=>setPage(location.hash.slice(1)||'home');addEventListener('hashchange',f);return()=>removeEventListener('hashchange',f)},[]);
  useEffect(()=>{if(d.user&&ob===null)setOb(!d.habits.length)},[d.user,d.habits,ob]);
+ // Sudah login & datang dengan ?app=<aplikasi lain>: lanjutkan ke tujuan (URL hanya dari registry; sekali per 30 dtk anti-loop)
+ useEffect(()=>{if(!d.user)return;const a=appFromUrl();if(a.self||!a.url)return;const k='sso:'+a.id;if(Date.now()-(+sessionStorage.getItem(k)||0)<30000)return;sessionStorage.setItem(k,String(Date.now()));location.replace(a.url)},[d.user]);
  if(d.loading)return <main><div className="card" aria-busy="true">Memuat…</div></main>;
  if(d.rec&&d.user)return <ResetPassword onDone={d.clearRec}/>;
  if(!d.user)return <Auth onDone={d.load}/>;
