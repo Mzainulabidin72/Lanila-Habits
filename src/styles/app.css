@@ -59,3 +59,33 @@ nav{left:0;right:0;bottom:0;display:flex;justify-content:space-around;border-wid
 @media(max-width:799px){.authx{grid-template-columns:1fr}.authx-l{padding:1.1rem 1.2rem;gap:.8rem;border-right:0;border-bottom:1px solid var(--bd)}
  .authx-l p,.authx-f,.authx-l small{display:none}.authx-l h2{font-size:1.3rem;margin:.6rem 0 0;max-width:none}.authx .logo{width:min(170px,55vw)}.authx-r{padding:1rem;align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.sw-l,.authx-c,.authx .err{animation:none!important}}
+/* ===== Dashboard Beranda ===== */
+.brand{display:none}
+@media(min-width:800px){.brand{display:flex;align-items:center;gap:.6rem;padding:.2rem .4rem 1rem}.brand .logo{width:104px;height:auto}.brand span{font-weight:700;color:var(--ac);border-left:2px solid var(--ac);padding-left:.6rem}nav a.on{background:var(--ac2)}}
+.topbar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;min-height:44px}.topbar b{font-size:1.05rem}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;text-decoration:none;padding:0}
+.ib.av{overflow:hidden;font-weight:700}.ib.av img{border-radius:50%;object-fit:cover}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}.dh h1{margin:0}
+.chip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--bd);border-radius:99px;padding:.1rem .7rem;margin-top:.3rem;background:var(--card)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin:1.2rem 0}.stats .card{margin:0;display:grid;gap:.1rem}.stats b{font-size:1.6rem;line-height:1.2}
+.dash{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1rem;align-items:start}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:1.1rem;margin-bottom:1rem}.panel .card{margin-bottom:.6rem}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:.8rem}
+.wd{width:100%;max-width:38px;aspect-ratio:1;margin:4px auto 0;border-radius:50%;display:grid;place-items:center;border:2px solid var(--ms);color:#fff}
+.wd.done{background:var(--ok);border-color:var(--ok)}.wd.part{background:var(--wa);border-color:var(--wa)}.wd.open{border-style:dashed}.wd.none{border-color:transparent;background:var(--bg)}
+.bar i{transition:width .5s ease}.panel:hover,.stats .card:hover{border-color:color-mix(in srgb,var(--ac) 35%,var(--bd))}
+@media(max-width:1023px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:799px){.dash{grid-template-columns:1fr}.stats b{font-size:1.35rem}.dh>div:last-child{text-align:left!important}}
+/* ===== Auth: toggle tema & input kata sandi ===== */
+.authx{position:relative}
+.authx-tt{position:absolute;top:1rem;right:1rem;z-index:5;width:40px;height:40px;border-radius:50%}
+.pw{position:relative;margin:.25rem 0 .7rem}.pw input{margin:0;padding-right:48px}
+.pw-b{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0;background:none;color:var(--mu);border-radius:10px;cursor:pointer}
+.pw-b:hover{color:var(--tx);background:var(--bg)}
+/* ===== Beranda v3 ===== */
+main.wide{max-width:1120px}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.dash2{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem;align-items:start}.dash2>.panel{margin:0}
+.s4{grid-column:span 4}.s2{grid-column:span 2}
+@media(max-width:1023px){.s4,.s2{grid-column:span 6}.s2.b{grid-column:span 3}.s2.b:last-child{grid-column:span 6}}
+@media(max-width:799px){.dash2{grid-template-columns:1fr}.dash2>.panel{grid-column:1/-1!important}}
