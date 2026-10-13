@@ -1,11 +1,24 @@
-import {useState,useEffect} from 'react';import {sb} from '../lib/supabase';import {achievements} from '../lib/achievements';import {today,addD,streaks,cons} from '../lib/habits';
+import {useState,useEffect} from 'react';import {sb} from '../lib/supabase';import {achievements,XP_PER} from '../lib/achievements';import Icon from '../components/Icon';
+const CATS=['Semua','Streak','Konsistensi','Aktivitas','Target'],fs=d=>new Date(d+'T00:00:00Z').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+const rem=a=>{const r=Math.ceil(a[4]-a[3]);return a[7]==='%'?`${r} poin konsistensi lagi`:`${r} ${a[7]} lagi`};
 export default function Achievements({habits,comp}){
- const[gd,setGd]=useState(0);
- useEffect(()=>{sb.from('lh_goals').select('id',{count:'exact',head:true}).eq('status','completed').then(({count})=>setGd(count||0))},[]);
- const A=achievements(habits,comp,gd);
- const open=A.filter(a=>a[3]>=a[4]).length;
- return <><h1>Pencapaian</h1><p className="mu">{open} dari {A.length} terbuka</p>
-  {A.map(a=>{const u=a[3]>=a[4],p=Math.min(100,Math.round(a[3]/a[4]*100));return <div key={a[1]} className={'card h '+(u?'done':'')} style={u?{}:{opacity:.75}}>
-   <div className="ic" aria-hidden="true">{u?a[0]:'🔒'}</div><div className="sp"><b>{a[1]}</b><div className="mu">{a[2]}</div>
-   <div className="bar" style={{marginTop:6}} role="progressbar" aria-valuenow={p} aria-valuemin="0" aria-valuemax="100"><i style={{width:p+'%'}}/></div></div><b>{u?'✓':Math.min(a[3],a[4])+'/'+a[4]}</b></div>})}</>;
+ const[gd,setGd]=useState(0),[gdate,setGdate]=useState(null),[cat,setCat]=useState('Semua');
+ useEffect(()=>{sb.from('lh_goals').select('completed_at').eq('status','completed').then(({data})=>{const r=data||[];setGd(r.length);setGdate(r.map(x=>x.completed_at).filter(Boolean).sort()[0]?.slice(0,10)||null)})},[]);
+ const A=achievements(habits,comp,gd,gdate),isU=a=>a[3]>=a[4],open=A.filter(isU),xp=A[0][3]*XP_PER+open.reduce((s,a)=>s+a[6],0);
+ const next=A.filter(a=>!isU(a)).sort((a,b)=>b[3]/b[4]-a[3]/a[4])[0],list=cat==='Semua'?A:A.filter(a=>a[5]===cat),pc=a=>Math.min(100,Math.round(a[3]/a[4]*100));
+ const msg=!open.length?'Selesaikan satu kebiasaan untuk membuka pencapaian pertamamu.':!next?'Semua pencapaian terbuka. Kamu menjaga konsistensi dengan luar biasa.':pc(next)>=50?`Sedikit lagi menuju ${next[1]}: ${rem(next)}.`:`Kamu sudah membuka ${open.length} dari ${A.length} pencapaian. Lanjutkan pelan-pelan.`;
+ const stat=(ic,l,v,s)=><div className="card"><span className="mu row" style={{gap:6}}><span style={{color:'var(--ac)'}}><Icon n={ic} s={16}/></span>{l}</span><b style={v&&v.length>14?{fontSize:'1.15rem'}:null}>{v}</b><span className="mu">{s}</span></div>;
+ return <div className="achp"><h1 style={{margin:0}}>Pencapaian</h1><p className="mu" style={{margin:'.2rem 0 0'}}>Rayakan setiap langkah konsistensimu.</p>
+  <div className="stats">{stat('award','Total Badge Terbuka',`${open.length} / ${A.length}`,'Pencapaian')}{stat('flame','Poin Pengalaman (XP)',xp,`${XP_PER} XP per aktivitas + bonus badge`)}{stat('target','Pencapaian Berikutnya',next?next[1]:'Semua terbuka',next?`${Math.min(next[3],next[4])}/${next[4]} ${next[7]}`:'Luar biasa')}{stat('chart','Progres Keseluruhan',Math.round(open.length/A.length*100)+'%','Badge terbuka')}</div>
+  {!habits.length&&<div className="panel" style={{textAlign:'center'}}><b>Belum ada pencapaian terbuka</b><p className="mu">Mulai dengan satu kebiasaan atau target untuk membuka badge pertamamu.</p><div className="row" style={{justifyContent:'center',flexWrap:'wrap'}}><a className="btn p" style={{display:'inline-flex',textDecoration:'none'}} href="#new">Buat kebiasaan</a><a className="btn" style={{display:'inline-flex',textDecoration:'none'}} href="#goals">Buat target</a></div></div>}
+  <section className="panel"><div className="row" style={{flexWrap:'wrap'}}><span style={{color:'var(--ac)'}}><Icon n="target" s={26}/></span><div className="sp" style={{minWidth:220}}><b>Pencapaian Berikutnya{next?`: ${next[1]}`:''}</b><div className="mu">{msg}</div>
+    {next&&<><div className="bar" style={{margin:'.5rem 0 .2rem'}} role="progressbar" aria-label={'Progres '+next[1]} aria-valuenow={pc(next)} aria-valuemin="0" aria-valuemax="100"><i style={{width:pc(next)+'%'}}/></div><span className="mu">{next[2]} Progres: {Math.min(next[3],next[4])}/{next[4]} {next[7]}</span></>}</div>
+    {next&&<a className="btn p" style={{display:'inline-flex',alignItems:'center',textDecoration:'none'}} href={'#'+next[8]}>{next[8]==='goals'?'Lihat Target':'Lihat Kebiasaan'}</a>}</div></section>
+  <div className="chips" role="group" aria-label="Kategori pencapaian" style={{marginTop:0}}>{CATS.map(c=>{const g=c==='Semua'?A:A.filter(a=>a[5]===c);return <button key={c} className={'btn '+(cat===c?'p':'')} aria-pressed={cat===c} onClick={()=>setCat(c)}>{c} ({g.filter(isU).length}/{g.length})</button>})}</div>
+  <div className="agrid">{list.map(a=>{const u=isU(a);return <article key={a[1]} className={'ach '+(u?'unl':'lck')}>
+    <div className="row" style={{alignItems:'flex-start'}}><div className="bd" aria-hidden="true">{a[0]}{!u&&<span className="lk">🔒</span>}</div><div className="sp" style={{minWidth:0}}><span className="mu" style={{fontSize:'.75rem'}}>{a[5]}</span><b style={{display:'block',fontSize:'1.05rem'}}>{a[1]}</b></div><span className={'bdg '+(u?'ok':'')}>{u?'Terbuka':'Terkunci'}</span></div>
+    <p className="mu" style={{margin:'.6rem 0'}}>{a[2]}</p>
+    <div className="row mu" style={{marginBottom:4}}><span className="sp">{Math.min(a[3],a[4])}/{a[4]} {a[7]}</span><b style={{color:'var(--tx)'}}>{pc(a)}%</b></div>
+    <div className="bar" role="progressbar" aria-label={'Progres '+a[1]} aria-valuenow={pc(a)} aria-valuemin="0" aria-valuemax="100"><i style={{width:pc(a)+'%'}}/></div>
+    <div className="mu" style={{marginTop:'.5rem',fontSize:'.85rem'}}>{u?(a[9]?'Diperoleh '+fs(a[9]):'Sudah tercapai'):'Hadiah'} · +{a[6]} XP</div></article>})}</div></div>;
 }
