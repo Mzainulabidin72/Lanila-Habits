@@ -18,12 +18,12 @@ export default function Auth({onDone}){
   setBusy(false)};
  return <AuthLayout app={app}><AppSwitcher value={app} onChange={pickApp}/><h1>{fg?'Lupa kata sandi?':reg?'Buat Akun Lanila':'Masuk'}</h1><p className="mu">{fg?'Masukkan email yang terhubung dengan Akun Lanila kamu.':'Satu akun untuk semua aplikasi Lanila.'}</p>
   <form onSubmit={go} noValidate>
-   {reg&&<><label htmlFor="n">Nama lengkap</label><input id="n" autoComplete="name" value={f.name} onChange={u('name')}/></>}
-   <label htmlFor="e">Email</label><input id="e" type="email" autoComplete="email" value={f.email} onChange={u('email')}/>
-   {!fg&&<><label htmlFor="p">Kata sandi</label><PasswordInput id="p" autoComplete={reg?'new-password':'current-password'} value={f.p} onChange={u('p')}/></>}
-   {reg&&<><label htmlFor="p2">Konfirmasi kata sandi</label><PasswordInput id="p2" autoComplete="new-password" value={f.p2} onChange={u('p2')}/></>}
+   {reg&&<><label htmlFor="n">Nama lengkap</label><input id="n" autoComplete="name" placeholder="Nama lengkap" value={f.name} onChange={u('name')}/></>}
+   <label htmlFor="e">Email</label><input id="e" type="email" autoComplete="email" placeholder="nama@email.com" value={f.email} onChange={u('email')}/>
+   {!fg&&<><label htmlFor="p">Kata sandi</label><PasswordInput id="p" placeholder="Masukkan kata sandi" autoComplete={reg?'new-password':'current-password'} value={f.p} onChange={u('p')}/></>}
+   {reg&&<><label htmlFor="p2">Konfirmasi kata sandi</label><PasswordInput id="p2" placeholder="Ulangi kata sandi" autoComplete="new-password" value={f.p2} onChange={u('p2')}/></>}
+   {mode==='login'&&<div className="fgl"><a href="#" className="lk" onClick={e=>{e.preventDefault();sw('forgot')}}>Lupa kata sandi?</a></div>}
    <div className="err" role="alert">{err}</div>{info&&<p role="status" style={{color:'var(--ok)'}}>{info}</p>}
-   <button className="btn lb" style={{width:'100%'}} disabled={busy}>{busy?'Memproses…':fg?'Kirim tautan reset':reg?'Daftar':'Masuk'}</button></form>
-  <p className="mu" style={{textAlign:'center'}}>{mode==='login'&&<><a href="#" style={{color:'var(--lb)'}} onClick={e=>{e.preventDefault();sw('forgot')}}>Lupa kata sandi?</a><br/></>}
-   <a href="#" style={{color:'var(--lb)'}} onClick={e=>{e.preventDefault();sw(mode==='login'?'register':'login')}}>{mode==='login'?'Belum punya akun? Daftar':'Kembali ke halaman masuk'}</a></p></AuthLayout>;
+   <button className="btn p" style={{width:'100%'}} disabled={busy}>{busy?'Memproses…':fg?'Kirim tautan reset':reg?'Daftar':'Masuk'}</button></form>
+  <p className="authx-alt">{mode==='login'?<>Belum punya akun? <a href="#" className="lk" onClick={e=>{e.preventDefault();sw('register')}}>Daftar</a></>:<a href="#" className="lk" onClick={e=>{e.preventDefault();sw('login')}}>Kembali ke halaman masuk</a>}</p></AuthLayout>;
 }

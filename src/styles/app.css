@@ -198,3 +198,30 @@ main.home .dash2{gap:1.25rem}
  .sf{display:block;flex:none;padding:12px 16px 16px;border-top:1px solid var(--bd)}
 }
 @media(prefers-reduced-motion:reduce){nav a{transition:none}}
+/* ===== Kebiasaan: grid ~70/30 ===== */
+.dash2.h10{grid-template-columns:repeat(10,minmax(0,1fr))}.s7{grid-column:span 7}.s3{grid-column:span 3}
+@media(max-width:1000px){.dash2.h10{grid-template-columns:minmax(0,1fr)}.dash2.h10>.panel{grid-column:1/-1}}
+/* ===== Auth v3 — mengikuti acuan login Buku Kas: panel sage + kartu putih ===== */
+.authx{--sage:#EAF0E9;--rbg:#F3F4F1;--fld:#F6F7F4;--tx:#202B39;--mu:#687789;--bd:#E5E9E4;--card:#fff;--acl:#B45309;background:var(--rbg)}
+[data-theme=dark] .authx{--sage:#161d19;--rbg:#0f1311;--fld:#1d2420;--acl:#fb9f3a}
+.authx-l{background:var(--sage);justify-content:center;position:relative;padding:3rem clamp(2rem,7vw,6.5rem);border-right:1px solid var(--bd)}
+.authx-g{max-width:640px}.authx-lg{line-height:0;margin-bottom:1.4rem}.authx .logo{width:min(200px,60vw)}
+.authx-pill{margin-bottom:.4rem}
+.authx-l h2{font-size:clamp(2rem,3.4vw,3rem);font-weight:800;line-height:1.12;max-width:17ch;margin:1rem 0 .9rem}
+.authx-l p{color:var(--mu);font-size:1.1rem;max-width:44ch}.authx-f{color:var(--mu);margin-top:1.6rem}
+.authx-l small{position:absolute;left:clamp(2rem,7vw,6.5rem);bottom:1.5rem}
+.authx-r{background:var(--rbg);padding:2rem}
+.authx-card{max-width:460px;padding:2.25rem;border-radius:22px;box-shadow:0 18px 48px rgba(32,43,57,.08)}
+.authx-card h1{font-size:2rem;font-weight:800;margin:.2rem 0 .3rem}.authx-card h1+p{margin:0 0 1.4rem}
+.authx label{color:var(--tx);font-weight:600;font-size:.95rem}
+.authx input:not([type=checkbox]){min-height:50px;padding:0 1rem;background:var(--fld);border:1px solid var(--bd);border-radius:12px;font-size:1rem;margin:.35rem 0 1rem;color:var(--tx)}
+.authx .pw{margin:.35rem 0 .4rem}.authx .pw input{margin:0;padding-right:52px}
+.authx input::placeholder{color:var(--mu);opacity:.8}
+.authx input:focus{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent);outline:none}
+.authx .sw-t{background:var(--fld)}
+.fgl{text-align:right;margin:0 0 1.1rem}.lk{color:var(--acl);font-weight:700;text-decoration:none}.lk:hover{text-decoration:underline}
+.authx .btn.p{min-height:52px;border-radius:12px;font-size:1rem;font-weight:700}
+.authx-alt{text-align:center;margin:1.3rem 0 0;color:var(--mu)}
+.authx-tt{background:var(--card);box-shadow:0 2px 10px rgba(32,43,57,.1);width:44px;height:44px;top:1.25rem;right:1.25rem}
+@media(max-width:1023px){.authx-l{padding:2rem}.authx-l small{left:2rem}.authx-card{padding:1.8rem}}
+@media(max-width:799px){.authx-l{padding:1.1rem 1.2rem}.authx-l small{display:none}.authx .logo{width:min(150px,50vw)}.authx-lg{margin-bottom:.6rem}.authx-l h2{font-size:1.3rem;margin:.6rem 0 0;max-width:none}.authx-r{padding:1rem}.authx-card{padding:1.4rem}.authx-tt{top:.8rem;right:.8rem}}

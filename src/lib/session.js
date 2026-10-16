@@ -1,3 +1,3 @@
-import {sb} from './supabase';
+import {sb} from './supabase';import {t} from './i18n';
 // Keluar dari akun (perangkat ini saja) dengan konfirmasi.
-export const signOut=()=>{if(confirm('Keluar dari akun Lanila di perangkat ini?'))sb.auth.signOut({scope:'local'})};
+export const signOut=()=>{if(confirm(t('act.confirm')))sb.auth.signOut({scope:'local'})};
