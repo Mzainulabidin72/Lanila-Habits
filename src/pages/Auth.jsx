@@ -22,8 +22,8 @@ export default function Auth({onDone}){
    <label htmlFor="e">Email</label><input id="e" type="email" autoComplete="email" placeholder="nama@email.com" value={f.email} onChange={u('email')}/>
    {!fg&&<><label htmlFor="p">Kata sandi</label><PasswordInput id="p" placeholder="Masukkan kata sandi" autoComplete={reg?'new-password':'current-password'} value={f.p} onChange={u('p')}/></>}
    {reg&&<><label htmlFor="p2">Konfirmasi kata sandi</label><PasswordInput id="p2" placeholder="Ulangi kata sandi" autoComplete="new-password" value={f.p2} onChange={u('p2')}/></>}
-   {mode==='login'&&<div className="fgl"><a href="#" className="lk" onClick={e=>{e.preventDefault();sw('forgot')}}>Lupa kata sandi?</a></div>}
+   {mode==='login'&&<div className="fgl"><a href="#" className="alk" onClick={e=>{e.preventDefault();sw('forgot')}}>Lupa kata sandi?</a></div>}
    <div className="err" role="alert">{err}</div>{info&&<p role="status" style={{color:'var(--ok)'}}>{info}</p>}
-   <button className="btn p" style={{width:'100%'}} disabled={busy}>{busy?'Memproses…':fg?'Kirim tautan reset':reg?'Daftar':'Masuk'}</button></form>
-  <p className="authx-alt">{mode==='login'?<>Belum punya akun? <a href="#" className="lk" onClick={e=>{e.preventDefault();sw('register')}}>Daftar</a></>:<a href="#" className="lk" onClick={e=>{e.preventDefault();sw('login')}}>Kembali ke halaman masuk</a>}</p></AuthLayout>;
+   <button className="btn lb" style={{width:'100%'}} disabled={busy}>{busy?'Memproses…':fg?'Kirim tautan reset':reg?'Daftar':'Masuk'}</button></form>
+  <p className="authx-alt">{mode==='login'?<>Belum punya akun? <a href="#" className="alk" onClick={e=>{e.preventDefault();sw('register')}}>Daftar</a></>:<a href="#" className="alk" onClick={e=>{e.preventDefault();sw('login')}}>Kembali ke halaman masuk</a>}</p></AuthLayout>;
 }

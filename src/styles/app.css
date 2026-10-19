@@ -219,9 +219,14 @@ main.home .dash2{gap:1.25rem}
 .authx input::placeholder{color:var(--mu);opacity:.8}
 .authx input:focus{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent);outline:none}
 .authx .sw-t{background:var(--fld)}
-.fgl{text-align:right;margin:0 0 1.1rem}.lk{color:var(--acl);font-weight:700;text-decoration:none}.lk:hover{text-decoration:underline}
+.fgl{text-align:right;margin:0 0 1.1rem}
 .authx .btn.p{min-height:52px;border-radius:12px;font-size:1rem;font-weight:700}
 .authx-alt{text-align:center;margin:1.3rem 0 0;color:var(--mu)}
 .authx-tt{background:var(--card);box-shadow:0 2px 10px rgba(32,43,57,.1);width:44px;height:44px;top:1.25rem;right:1.25rem}
 @media(max-width:1023px){.authx-l{padding:2rem}.authx-l small{left:2rem}.authx-card{padding:1.8rem}}
 @media(max-width:799px){.authx-l{padding:1.1rem 1.2rem}.authx-l small{display:none}.authx .logo{width:min(150px,50vw)}.authx-lg{margin-bottom:.6rem}.authx-l h2{font-size:1.3rem;margin:.6rem 0 0;max-width:none}.authx-r{padding:1rem}.authx-card{padding:1.4rem}.authx-tt{top:.8rem;right:.8rem}}
+/* ===== Auth v4 — identitas ungu/biru Lanila (--lb); perbaikan tabrakan nama kelas ".lk" ===== */
+.alk{color:var(--lb);font-weight:700;text-decoration:none}.alk:hover{text-decoration:underline}
+.authx .btn.lb{min-height:52px;border-radius:12px;font-size:1rem;font-weight:700}
+.authx input:focus{border-color:var(--lb);box-shadow:0 0 0 3px color-mix(in srgb,var(--lb) 25%,transparent);outline:none}
+.authx-pill{border-left-color:var(--lb)}.authx-f li::before{color:var(--lb)}
