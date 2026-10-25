@@ -1,7 +1,7 @@
 import {useState,useEffect} from 'react';import useData from './hooks/useData';
 import Auth from './pages/Auth';import Home from './pages/Home';import Habits from './pages/Habits';import NewHabit from './pages/NewHabit';
 import Calendar from './pages/Calendar';import Stats from './pages/Stats';import Reflect from './pages/Reflect';import Settings from './pages/Settings';import HabitDetail from './pages/HabitDetail';
-import Goals from './pages/Goals';import Achievements from './pages/Achievements';import useReminders from './hooks/useReminders';import History from './pages/History';import {appFromUrl} from './lib/apps';import {signOut} from './lib/session';import {useT} from './lib/i18n';import Icon from './components/Icon';import Logo from './components/Logo';import {setTheme} from './lib/theme';import ResetPassword from './pages/ResetPassword';
+import Goals from './pages/Goals';import Achievements from './pages/Achievements';import useReminders from './hooks/useReminders';import History from './pages/History';import {signOut} from './lib/session';import {useT} from './lib/i18n';import Icon from './components/Icon';import Logo from './components/Logo';import {setTheme} from './lib/theme';import ResetPassword from './pages/ResetPassword';
 // [id, ikon, label, kelas] — 'dm' disembunyikan di bottom nav HP (masuk Menu), 'mo' hanya tampil di HP
 const NAV=[['home','home','Beranda'],['habits','checkc','Kebiasaan'],['calendar','calendar','Kalender'],['goals','target','Target'],['stats','chart','Statistik','dm'],['reflect','pen','Refleksi','dm'],['achievements','award','Pencapaian','dm'],['history','clock','Riwayat','dm'],['settings','settings','Pengaturan','dm'],['menu','menu','Menu','mo']];
 const GR=[['Overview',['home']],['Habit Management',['habits','calendar','goals','stats']],['Personal Growth',['reflect','achievements','history']],['Account',['settings']]];
@@ -9,8 +9,6 @@ export default function App(){
  const d=useData();useReminders(d.habits,d.comp);const[,tick]=useState(0),t=useT();const [page,setPage]=useState(location.hash.slice(1)||'home'),[ob,setOb]=useState(null);
  useEffect(()=>{const f=()=>setPage(location.hash.slice(1)||'home');addEventListener('hashchange',f);return()=>removeEventListener('hashchange',f)},[]);
  useEffect(()=>{if(d.user&&ob===null)setOb(!d.habits.length&&!localStorage.getItem('ob:'+d.user.id));if(d.user&&d.habits.length)localStorage.setItem('ob:'+d.user.id,'1')},[d.user,d.habits,ob]);
- // Sudah login & datang dengan ?app=<aplikasi lain>: lanjutkan ke tujuan (URL hanya dari registry; sekali per 30 dtk anti-loop)
- useEffect(()=>{if(!d.user)return;const a=appFromUrl();if(a.self||!a.url)return;const k='sso:'+a.id;if(Date.now()-(+sessionStorage.getItem(k)||0)<30000)return;sessionStorage.setItem(k,String(Date.now()));location.replace(a.url)},[d.user]);
  useEffect(()=>{const f=()=>tick(n=>n+1);addEventListener('lh-theme',f);return()=>removeEventListener('lh-theme',f)},[]);
  useEffect(()=>{if(page==='profile')location.replace('#settings')},[page]);
  if(d.loading)return <main><div className="card" aria-busy="true">{t('loading')}</div></main>;

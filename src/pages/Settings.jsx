@@ -1,6 +1,6 @@
 import {useState,useEffect} from 'react';import {sb} from '../lib/supabase';import {streaks,periodStats} from '../lib/habits';import {achievements} from '../lib/achievements';
 import {getTheme,setTheme,toast} from '../lib/theme';import {pushSupported,enablePush,disablePush} from '../lib/push';import {useT,getLang,setLang} from '../lib/i18n';import {signOut} from '../lib/session';
-import AppLauncher from '../components/AppLauncher';import PasswordCard from '../components/PasswordCard';import Icon from '../components/Icon';
+import {version} from '../../package.json';import PasswordCard from '../components/PasswordCard';import Icon from '../components/Icon';
 const TH=[['light','sun'],['dark','moon'],['system','sliders']],OKT=['image/jpeg','image/png','image/webp','image/gif'];
 const resize=f=>new Promise((res,rej)=>{const i=new Image(),u=URL.createObjectURL(f);i.onload=()=>{const s=Math.min(1,256/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(),'image/jpeg',.85)};i.onerror=()=>rej();i.src=u});
 const chk=(l,on,fn,dis)=><label className="row" style={{minHeight:44}}><input type="checkbox" style={{width:22,minHeight:22,margin:0}} checked={on} disabled={dis} onChange={fn}/> {l}</label>;
@@ -48,6 +48,6 @@ export default function Settings({user,habits=[],paused=[],comp,load}){
      <div style={{borderTop:'1px solid var(--bd)',paddingTop:'.7rem',marginTop:'.4rem'}}><b style={{fontSize:'.9rem'}}>{t('perm.title')}</b><p className="mu" style={{margin:'.2rem 0 .6rem'}}>{t('perm.'+perm)}</p>
       {perm==='default'&&<button className="btn" onClick={()=>Notification.requestPermission().then(setPerm)}>{t('perm.btn')}</button>}
       <p className="mu" style={{margin:'.6rem 0 0',fontSize:'.85rem'}}>{P&&push?t('rem.pushOn'):t('rem.pushOff')} {t('rem.device')}</p></div></section></div></div>
-  <section className="panel" style={{marginTop:'1.2rem'}}><h2 style={{marginTop:0}}>{t('eco.title')}</h2><p className="mu" style={{margin:0}}>{t('eco.sub')}</p><AppLauncher/></section>
+  <section className="panel" style={{marginTop:'1.2rem'}}><h2 style={{marginTop:0}}>{t('about.title')}</h2><div><b>Lanila Habits</b></div><div className="mu">{t('about.version',{v:version})}</div><div className="mu">© Lanila 2026</div></section>
   <section className="panel dng" style={{marginTop:'1.2rem'}}><h2 style={{marginTop:0}}>{t('act.title')}</h2><p className="mu" style={{margin:'0 0 .8rem'}}>{t('act.note')}</p><button className="btn dg" onClick={signOut}>{t('act.logout')}</button></section></div>;
 }
